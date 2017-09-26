@@ -1,5 +1,5 @@
 # SKE Restaurant
- by Your Name
+ by warat narattharaksa
 
  A command line interface for a simple food ordering application.
  (Add more info about your project.)
