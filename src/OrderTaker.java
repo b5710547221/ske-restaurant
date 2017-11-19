@@ -11,18 +11,15 @@ import java.util.*;
  */
 public class OrderTaker {
 	static Scanner console = new Scanner(System.in);
+   
+	private static String[] menuItems = RestaurantManager.getMenuItems();
 
-	// private static final Object[][] menuItemsAndPrice = { { "Pizza", 250 }, {
-	// "Chicken", 120 }, { "Coke", 45 } };
+	private static double[] prices = RestaurantManager.getPrices();
 
-	private static final String[] menu = { "Papaya", "Chicken", "Coke", "Water" };
-
-	private static final double[] price_list = { 25.00, 120.00, 45.00, 10.00 };
-
-	private static double[] price = new double[menu.length];
+	private static ArrayList<Double> price = new ArrayList<Double>();
 
 	private static int orderNumber = 1;
-
+ 
 	public static void main(String[] args) {
 
 		// HW2
@@ -34,21 +31,20 @@ public class OrderTaker {
 		// for(int i = 0 ;i< res.getPrices().size();i++){
 		// priceFile[i] = res.getPrices().get(i);
 		// }
-		
 
 		String exit = "n";
+		RestaurantManager.init();
+		int[] order = new int[menuItems.length];
 		do {
-			int[] order = makeOrder(menu, price_list);
 
-			
-			 //order = makeOrder(menu, price_list);
+			 order =makeOrder(menuItems, prices);
+
 			System.out.print("Are you want to finished order? ((y)es or (n)o ) --comfirm payment: ");
 			exit = console.next();
 		} while (!exit.equals("y"));
 		console.close();
 		System.out.println("Processing your order!!!");
-
-		// HW3
+		RestaurantManager.recordOrder(orderNumber, order, getTotal(order)) ;
 
 	}
 
@@ -78,9 +74,11 @@ public class OrderTaker {
 	 * add order
 	 */
 	public static int[] makeOrder(String[] menuFile, double[] price) {
+
 		int[] order = new int[menuFile.length];
+
 		int i = 0, j = 0, terminate = 0;
-		String choice = "",new_choice="";
+		String choice = "", new_choice = "";
 		do {
 			printMenu(price);
 
@@ -95,7 +93,7 @@ public class OrderTaker {
 			}
 
 			int quantitySub = getQuantitySub();
-			double[] priceFile = new double[menuFile.length];
+			double[] priceFile = new double[price.length];
 			try {
 				order = addToOrder(order, Integer.parseInt(choice), quantitySub);
 			} catch (NumberFormatException ex) {
@@ -103,11 +101,11 @@ public class OrderTaker {
 			}
 			priceFile = acceptPayment(order, price, priceFile);
 			printReceipt(order, orderNumber, priceFile, menuFile);
-			
+
 			do {
 				System.out.print("Do you want edit menu? enter old menu ID : (if not enter (-1): ");
 				choice = getChoice();
-				if( Integer.parseInt(choice) == -1){
+				if (Integer.parseInt(choice) == -1) {
 					break;
 				}
 				System.out.print("Enter new menu ID :");
@@ -124,14 +122,15 @@ public class OrderTaker {
 				printReceipt(order, orderNumber, priceFile, menuFile);
 				System.out.print("Edit complete enter (-1) to continue payment  continue (any number): ");
 				terminate = console.nextInt();
-				
+
 			} while (terminate != -1);
-			if(terminate == -1){
+			if (terminate == -1) {
 				break;
 			}
 		} while ((!choice.equals("A")) && (!choice.equals("B")));
-		
+
 		orderNumber++;
+		
 		return order; // other parts of code can use order, too.
 	}
 
@@ -170,9 +169,9 @@ public class OrderTaker {
 	 */
 	public static void printMenu(double[] price_list_file) {
 		System.out.println("--------Welcome to SKE Restaurant---------");
-		for (int i = 0; i < menu.length && i < price_list_file.length; i++) {
+		for (int i = 0; i < menuItems.length && i < price_list_file.length; i++) {
 
-			System.out.printf((i + 1) + ".) %-13s%-8.2fBaht.\n", menu[i], price_list_file[i]);
+			System.out.printf((i + 1) + ".) %-13s%-8.2fBaht.\n", menuItems[i], price_list_file[i]);
 
 		}
 		System.out.printf("A.) %-13s\n", "Check bill -- View");
@@ -217,7 +216,7 @@ public class OrderTaker {
 	public static double getTotal(int[] order) {
 		double total = 0.0;
 		for (int k = 0; k < order.length; k++) {
-			total += order[k] * price_list[k];
+			total += order[k] * prices[k];
 			// total += order[k] *price[k];
 		}
 		// do other stuff, like add VAT or apply a discount
